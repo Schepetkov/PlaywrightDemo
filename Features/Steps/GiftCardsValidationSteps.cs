@@ -107,13 +107,13 @@ namespace PlaywrightTests.Steps
         }
 
         [Given(@"I choose the Animated card")]
-        public async Task GivenIChooseTheAnimatedCardAsync()
+        public async Task ChooseAnimatedGiftCard()
         {
             await _giftCardsPage.GetPage().ClickAsync(_giftCardsPage.AnimatedButton);
 
             await _giftCardsPage.WaitUntilDesignTitleTextChange();
-            await _giftCardsPage.IsAnimatedButtonSelected();
 
+            Assert.AreEqual(await _giftCardsPage.IsAnimatedButtonSelected(), true);
             Assert.AreEqual(await _giftCardsPage.GetDesignTitleText(), _giftCardsPage.DesignTitleAnimatedText);
         }
 
