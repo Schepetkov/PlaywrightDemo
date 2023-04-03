@@ -5,8 +5,8 @@ Given I navigate to 'https://www.amazon.com/'
 	Then I search 'Gift Cards' 
 	And I choose the gift card by type name 'EGiftCards'
 	Then I wait load state 'NetworkIdle'
-	And I pick gift card design 'Standard'
-	Then I click to card type by image name 'Amazon Logo'
+	And I click to button by name 'Standard'
+	And I click to button by name 'Amazon Logo'
 
 @positive
 Scenario: validate gift card total amount with custom amount

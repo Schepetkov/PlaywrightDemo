@@ -15,13 +15,13 @@
     public class GiftCardsValidationSteps
     {
         private readonly HomePage homePage = null;
-        private readonly GiftCards giftCardsPage = null;
+        private readonly GiftCardsPage giftCardsPage = null;
         private readonly ScenarioContext scenarioContext = null;
 
         public GiftCardsValidationSteps(Driver driver, ScenarioContext scenarioContext)
         {
             this.homePage = new HomePage(driver.Page);
-            this.giftCardsPage = new GiftCards(driver.Page);
+            this.giftCardsPage = new GiftCardsPage(driver.Page);
             this.scenarioContext = scenarioContext;
         }
 
@@ -51,24 +51,11 @@
             await this.homePage.ClickToGiftCardsByType(giftCardsType);
         }
 
-        [Then(@"I pick gift card design '([^']*)'")]
-        public async Task PickGiftCardDesignByName(string designName)
-        {
-            Enum.TryParse(designName, out EGiftCardsDesignName giftCardsDesignName);
-            await this.giftCardsPage.ClickToGiftCardDesignButtonByName(giftCardsDesignName);
-        }
-
         [Then(@"I wait load state '([^']*)'")]
         public async Task WaitLoadState(string stateToWaite)
         {
             Enum.TryParse(stateToWaite, out LoadState state);
             await this.homePage.GetPage().WaitForLoadStateAsync(state);
-        }
-
-        [Then(@"I click to card type by image name '([^']*)'")]
-        public async Task ClickToCardTypeByImageName(string imageName)
-        {
-            await this.giftCardsPage.GetPage().GetByRole(AriaRole.Button, new () { Name = imageName, Exact = true }).ClickAsync();
         }
 
         [Then(@"I enter gift card details")]
@@ -86,7 +73,7 @@
                 bool bCustomAmount = false;
                 if (field.Amount != null)
                 {
-                    await this.giftCardsPage.GetPage().GetByRole(AriaRole.Button, new () { Name = $"${field.Amount}" }).ClickAsync();
+                    await this.ClickToButtonByName($"${field.Amount}");
                 }
                 else if (field.CustomAmount != null)
                 {
@@ -96,23 +83,23 @@
 
                 if (field.DeliveryEmail != null)
                 {
-                    await this.giftCardsPage.GetPage().GetByRole(AriaRole.Button, new () { Name = "Email" }).ClickAsync();
-                    await this.giftCardsPage.GetPage().GetByPlaceholder("Enter an email for each recipient").FillAsync(field.DeliveryEmail);
+                    await this.ClickToButtonByName(GiftCardsPage.EmailGiftCardDetailsButton);
+                    await this.giftCardsPage.GetPage().GetByPlaceholder(GiftCardsPage.ToEmailGiftCardDetailsField).FillAsync(field.DeliveryEmail);
                 }
 
                 if (field.From != null)
                 {
-                    await this.giftCardsPage.GetPage().GetByLabel("From").FillAsync(field.From);
+                    await this.giftCardsPage.GetPage().GetByLabel(GiftCardsPage.FromGiftCardDetailsField).FillAsync(field.From);
                 }
 
                 if (field.Message != null)
                 {
-                    await this.giftCardsPage.GetPage().GetByRole(AriaRole.Textbox, new () { Name = "Message" }).FillAsync(field.Message);
+                    await this.giftCardsPage.GetPage().GetByRole(AriaRole.Textbox, new () { Name = GiftCardsPage.MessageGiftCardDetailsField }).FillAsync(field.Message);
                 }
 
                 if (field.Quantity != null)
                 {
-                    await this.giftCardsPage.GetPage().GetByText("Quantity").FillAsync(field.Quantity);
+                    await this.giftCardsPage.GetPage().GetByText(GiftCardsPage.QuantityGiftCardDetailsField).FillAsync(field.Quantity);
                 }
 
                 if (field.DeliveryDate != null)
@@ -131,29 +118,37 @@
                     await this.giftCardsPage.GetPage().GetByRole(AriaRole.Link, new () { Name = date, Exact = true }).ClickAsync();
                 }
 
-                int.TryParse(field.Quantity, out int ammountQuantity);
+                int.TryParse(field.Quantity, out int amountQuantity);
 
                 int ammountNumber = 0;
-                var result = bCustomAmount ? int.TryParse(field.CustomAmount, out ammountNumber) : int.TryParse(field.Amount, out ammountNumber);
+                if (bCustomAmount)
+                {
+                    int.TryParse(field.CustomAmount, out ammountNumber);
+                }
+                else
+                {
+                    int.TryParse(field.Amount, out ammountNumber);
+                }
 
-                var totalAmmount = ammountQuantity * ammountNumber;
+                var totalAmountValue = amountQuantity * ammountNumber;
 
-                await this.giftCardsPage.GetPage().Locator("#gc-buy-box-text").GetByText($"${totalAmmount}").ClickAsync();
+                // validate total amount before added to cart
+                await this.giftCardsPage.GetPage().Locator("#gc-buy-box-text").GetByText($"${totalAmountValue}").ClickAsync();
 
-                this.scenarioContext.Set<int>(totalAmmount, HomePage.TotalAmount);
+                this.scenarioContext.Set<int>(totalAmountValue, HomePage.TotalAmountKeyName);
             }
         }
 
         [Then(@"I click to button by name '([^']*)'")]
         public async Task ClickToButtonByName(string buttonName)
         {
-            await this.giftCardsPage.GetPage().GetByRole(AriaRole.Button, new () { Name = buttonName }).ClickAsync();
+            await this.homePage.ClickToButtonByName(buttonName);
         }
 
         [Then(@"I validate cart total amount")]
         public async Task ValidateCartTotalAmmount()
         {
-            await this.homePage.GetPage().GetByText($"Cart Subtotal: ${this.scenarioContext.Get<int>(HomePage.TotalAmount)}").ClickAsync();
+            await this.homePage.GetPage().GetByText($"Cart Subtotal: ${this.scenarioContext.Get<int>(HomePage.TotalAmountKeyName)}").ClickAsync();
         }
     }
 }

@@ -12,7 +12,7 @@
         {
         }
 
-        public static string TotalAmount => "TotalAmount";
+        public static string TotalAmountKeyName => "TotalAmount";
 
         private static string AmazonSearchPlaceholder => "Search Amazon";
 
@@ -24,7 +24,7 @@
         public async Task Search(string searchText)
         {
             await this.GetPage().GetByPlaceholder(AmazonSearchPlaceholder).FillAsync(searchText);
-            await this.GetPage().GetByPlaceholder(AmazonSearchPlaceholder).PressAsync("Enter");
+            await this.GetPage().GetByPlaceholder(AmazonSearchPlaceholder).PressAsync(BasePage.EnterButtonName);
         }
 
         public async Task ClickToGiftCardsByType(EGiftCardsType giftCardsType)
@@ -45,7 +45,6 @@
             }
         }
 
-        // alt="Amazon.com eGift Card"
         private async Task ClickToEGiftCard() => await this.GetPage().GetByRole(AriaRole.Link, new () { Name = EGiftCard }).First.ClickAsync();
     }
 }
