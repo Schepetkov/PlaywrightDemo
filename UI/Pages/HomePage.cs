@@ -1,26 +1,51 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Playwright;
-
-namespace PlaywrightTests.UI.Pages
+﻿namespace PlaywrightTests.UI.Pages
 {
+    using System;
+    using System.Threading.Tasks;
+    using Microsoft.Playwright;
+    using PlaywrightTests.Models;
+
     public class HomePage : BasePage
     {
-        private static string GiftCards => "text=Gift Cards";
-        private static string DoNotChangeButton => "text=Don't Change Change Address";
+        public HomePage(IPage page)
+           : base(page)
+        {
+        }
 
-        public HomePage(IPage page) : base(page) { }
+        public static string TotalAmount => "TotalAmount";
 
-        public async Task<bool> IsDoNotChangeButtonVisible()
+        private static string AmazonSearchPlaceholder => "Search Amazon";
+
+        private static string EGiftCard => "Amazon.com eGift Card";
+
+        // Part of the URL can be different
+        private static string EGiftCardUrlStringValidation => "**/Amazon-eGift-Card-Logo/**";
+
+        public async Task Search(string searchText)
         {
-            return await Page.IsVisibleAsync(DoNotChangeButton);
+            await this.GetPage().GetByPlaceholder(AmazonSearchPlaceholder).FillAsync(searchText);
+            await this.GetPage().GetByPlaceholder(AmazonSearchPlaceholder).PressAsync("Enter");
         }
-        public async Task ClickGiftCardsTab()
+
+        public async Task ClickToGiftCardsByType(EGiftCardsType giftCardsType)
         {
-            await Page.ClickAsync(GiftCards);
+            switch (giftCardsType)
+            {
+                case EGiftCardsType.EGiftCards:
+                    await this.GetPage().RunAndWaitForNavigationAsync(async () =>
+                    {
+                        await this.ClickToEGiftCard();
+                    }, new PageRunAndWaitForNavigationOptions
+                    {
+                        UrlString = EGiftCardUrlStringValidation,
+                    });
+                    break;
+                default:
+                    throw new InvalidOperationException($"HomePage.ClickToGiftCardsByType::giftCardsType - has incorrect type name: {giftCardsType}");
+            }
         }
-        public async Task ClickDoNotChangeButton()
-        {
-            await Page.ClickAsync(DoNotChangeButton);
-        }
+
+        // alt="Amazon.com eGift Card"
+        private async Task ClickToEGiftCard() => await this.GetPage().GetByRole(AriaRole.Link, new () { Name = EGiftCard }).First.ClickAsync();
     }
 }

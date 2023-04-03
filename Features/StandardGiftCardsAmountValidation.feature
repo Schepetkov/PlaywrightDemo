@@ -1,45 +1,54 @@
-﻿Feature: StandardGiftCardsAmountValidation
+﻿Feature: StandardGiftCardsCartTotalAmountValidation
 
 Background:
-Given I navigate to application
-	And I click on the gift cards tab
-	And I click on the picture eGif card
-	And Fill in To 'shepetkov.dm@gmail.com'
-	And Fill in From 'Dmitriy'
-	And Fill in Message 'My message'
+Given I navigate to 'https://www.amazon.com/'
+	Then I search 'Gift Cards' 
+	And I choose the gift card by type name 'EGiftCards'
+	Then I wait load state 'NetworkIdle'
+	And I pick gift card design 'Standard'
+	Then I click to card type by image name 'Amazon Logo'
 
-@AmountCheck @Standard @Positive
-Scenario: Add to cart gift card with email delivery with custom ammount
-	And I choose the amount '345'$
-	And Fill in Quantity '1'
-	Then I'm adding a gift card to my cart
+@positive
+Scenario: validate gift card total amount with custom amount
+	Then I enter gift card details
+	| Custom Amount | Delivery Email          | From    | Message    | Quantity | Delivery Date |
+	| 324           | schepetkov.dm@gmail.com | Dmitriy | Well Done! | 2        | Today         |
+	And I click to button by name 'Add to cart'
+	Then I wait load state 'NetworkIdle'
+	And I validate cart total amount
 
-@AmountCheck @Standard @Positive
-Scenario: Add to cart gift card with email delivery with custom ammount (total amount check)
-	And I choose the amount '453'$
-	And Fill in Quantity '2'
-	Then I'm adding a gift card to my cart
+@positive
+Scenario: validate gift card total amount with fix sum 25$
+	Then I enter gift card details
+	| Amount | Delivery Email          | From    | Message    | Quantity | Delivery Date |
+	| 25     | schepetkov.dm@gmail.com | Dmitriy | Well Done! | 8        | Today         |
+	And I click to button by name 'Add to cart'
+	Then I wait load state 'NetworkIdle'
+	And I validate cart total amount
 
-@AmountCheck @Standard @Positive
-Scenario: Add to cart gift card with email delivery with fixed amount 25$
-	And I choose the amount '25'$
-	And Fill in Quantity '1'
-	Then I'm adding a gift card to my cart
+@positive
+Scenario: validate gift card total amount with fix sum 50$
+	Then I enter gift card details
+	| Amount | Delivery Email          | From    | Message    | Quantity | Delivery Date |
+	| 50     | schepetkov.dm@gmail.com | Dmitriy | Well Done! | 4        | Today         |
+	And I click to button by name 'Add to cart'
+	Then I wait load state 'NetworkIdle'
+	And I validate cart total amount
 
-@AmountCheck @Standard @Positive
-Scenario: Add to cart gift card with email delivery with fixed amount 50$
-	And I choose the amount '50'$
-	And Fill in Quantity '1'
-	Then I'm adding a gift card to my cart
+@positive
+Scenario: validate gift card total amount with fix sum 75$
+	Then I enter gift card details
+	| Amount | Delivery Email          | From    | Message    | Quantity | Delivery Date |
+	| 75     | schepetkov.dm@gmail.com | Dmitriy | Well Done! | 3        | Today         |
+	And I click to button by name 'Add to cart'
+	Then I wait load state 'NetworkIdle'
+	And I validate cart total amount
 
-@AmountCheck @Standard @Positive
-Scenario: Add to cart gift card with email delivery with fixed amount 75$
-	And I choose the amount '75'$
-	And Fill in Quantity '1'
-	Then I'm adding a gift card to my cart
-
-@AmountCheck @Standard @Positive
-Scenario: Add to cart gift card with email delivery with fixed amount 100$
-	And I choose the amount '100'$
-	And Fill in Quantity '1'
-	Then I'm adding a gift card to my cart
+@positive
+Scenario: validate gift card total amount with fix sum 100$
+	Then I enter gift card details
+	| Amount | Delivery Email          | From    | Message    | Quantity | Delivery Date |
+	| 100    | schepetkov.dm@gmail.com | Dmitriy | Well Done! | 5        | Today         |
+	And I click to button by name 'Add to cart'
+	Then I wait load state 'NetworkIdle'
+	And I validate cart total amount

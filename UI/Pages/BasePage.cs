@@ -1,12 +1,20 @@
-﻿using Microsoft.Playwright;
-
-namespace PlaywrightTests.UI.Pages
+﻿namespace PlaywrightTests.UI.Pages
 {
+    using FluentAssertions;
+    using Microsoft.Playwright;
+
     public class BasePage
     {
-        protected IPage Page;
-        public BasePage(IPage page) => Page = page;
+        private readonly IPage page;
 
-        public IPage GetPage() => Page;
+        public BasePage(IPage page) => this.page = page;
+
+        public IPage GetPage() => this.page;
+
+        public void StopTestWithReason(string reason)
+        {
+            var bTestFail = true;
+            bTestFail.Should().BeFalse($"{reason}");
+        }
     }
 }

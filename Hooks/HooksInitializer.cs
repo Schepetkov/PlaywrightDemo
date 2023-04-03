@@ -1,30 +1,23 @@
-﻿using Microsoft.Playwright;
-using NUnit.Framework;
-using PlaywrightTests.Models;
-using PlaywrightTests.WebDriver;
-using System.Threading.Tasks;
+﻿using NUnit.Framework;
 using TechTalk.SpecFlow;
+
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 
 namespace PlaywrightTests.Hooks
 {
     [Binding]
-    class HooksInitializer
+    internal class HooksInitializer
     {
-        Context _context;
-        public HooksInitializer(Context context) => _context = context;
-
         [BeforeScenario]
-        public async Task BeforeScenario()
+        public void BeforeScenario()
         {
-            PlaywrightDriver playwrightDriver = new PlaywrightDriver();
-            _context.Page = await playwrightDriver.CreatePlaywright(BrowserType.Chromium, new BrowserTypeLaunchOptions { Headless = false });
+            // do all what you need before test start
         }
 
         [AfterScenario]
-        public async Task AfterScenario()
+        public void AfterScenario()
         {
-           await _context.Page.CloseAsync();
+            // call after test will finished
         }
     }
 }

@@ -1,121 +1,159 @@
-﻿using NUnit.Framework;
-using PlaywrightTests.Hooks;
-using System.Threading.Tasks;
-using PlaywrightTests.UI.Pages;
-using TechTalk.SpecFlow;
-
-namespace PlaywrightTests.Steps
+﻿namespace PlaywrightTests.Steps
 {
+    using System;
+    using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
+    using Microsoft.Playwright;
+    using PlaywrightTests.Models;
+    using PlaywrightTests.UI.Pages;
+    using PlaywrightTests.UI.Pages.GiftCards;
+    using PlaywrightTests.WebDriver;
+    using TechTalk.SpecFlow;
+    using TechTalk.SpecFlow.Assist;
+
     [Binding]
     public class GiftCardsValidationSteps
     {
-        readonly Context _context = null;
-        readonly HomePage _homePage = null;
-        readonly GiftCards _giftCardsPage = null;
-        readonly CartPage _cartPage = null;      
-        
-        int _giftGardAmount = 0;
-        int _quantity = 0;
+        private readonly HomePage homePage = null;
+        private readonly GiftCards giftCardsPage = null;
+        private readonly ScenarioContext scenarioContext = null;
 
-        public GiftCardsValidationSteps(Context context)
+        public GiftCardsValidationSteps(Driver driver, ScenarioContext scenarioContext)
         {
-            _context = context;
-            _homePage = new HomePage(_context.Page);
-            _giftCardsPage = new GiftCards(_context.Page);
-            _cartPage = new CartPage(_context.Page);
+            this.homePage = new HomePage(driver.Page);
+            this.giftCardsPage = new GiftCards(driver.Page);
+            this.scenarioContext = scenarioContext;
         }
 
-        [Given(@"I navigate to application")]
-        public async Task NavigateTo()
+        [Given(@"I navigate to '([^']*)'")]
+        public async Task NavigateTo(string url)
         {
-            await _context.Page.GotoAsync("https://www.amazon.com/");
+            await this.homePage.GetPage().GotoAsync(url);
+            string title = url.Substring(url.IndexOf(".") + 1);
+            string removeLastCharFromTitleResult = title.Remove(title.Length - 1, 1);
 
-            if (_homePage != null && await _homePage.IsDoNotChangeButtonVisible())
+            removeLastCharFromTitleResult.ToUpper();
+            string titleToValidate = removeLastCharFromTitleResult.Remove(1).ToUpper() + removeLastCharFromTitleResult.Substring(1);
+
+            await Assertions.Expect(this.homePage.GetPage()).ToHaveTitleAsync(new Regex(titleToValidate));
+        }
+
+        [Then(@"I search '([^']*)'")]
+        public async Task Search(string searchText)
+        {
+            await this.homePage.Search(searchText);
+        }
+
+        [Then(@"I choose the gift card by type name '([^']*)'")]
+        public async Task ClickOnGiftCardByTypeName(string giftCardTypeName)
+        {
+            Enum.TryParse(giftCardTypeName, out EGiftCardsType giftCardsType);
+            await this.homePage.ClickToGiftCardsByType(giftCardsType);
+        }
+
+        [Then(@"I pick gift card design '([^']*)'")]
+        public async Task PickGiftCardDesignByName(string designName)
+        {
+            Enum.TryParse(designName, out EGiftCardsDesignName giftCardsDesignName);
+            await this.giftCardsPage.ClickToGiftCardDesignButtonByName(giftCardsDesignName);
+        }
+
+        [Then(@"I wait load state '([^']*)'")]
+        public async Task WaitLoadState(string stateToWaite)
+        {
+            Enum.TryParse(stateToWaite, out LoadState state);
+            await this.homePage.GetPage().WaitForLoadStateAsync(state);
+        }
+
+        [Then(@"I click to card type by image name '([^']*)'")]
+        public async Task ClickToCardTypeByImageName(string imageName)
+        {
+            await this.giftCardsPage.GetPage().GetByRole(AriaRole.Button, new () { Name = imageName, Exact = true }).ClickAsync();
+        }
+
+        [Then(@"I enter gift card details")]
+        public async Task EnterGiftCardDetails(Table details)
+        {
+            var cardDetails = details.CreateSet<GiftCard>();
+            if (cardDetails == null)
             {
-                await _homePage.ClickDoNotChangeButton();
+                this.homePage.StopTestWithReason("EnterGiftCardDetails::cardDetails == null");
+                return;
+            }
+
+            foreach (var field in cardDetails)
+            {
+                bool bCustomAmount = false;
+                if (field.Amount != null)
+                {
+                    await this.giftCardsPage.GetPage().GetByRole(AriaRole.Button, new () { Name = $"${field.Amount}" }).ClickAsync();
+                }
+                else if (field.CustomAmount != null)
+                {
+                    await this.giftCardsPage.GetPage().GetByLabel("Amount").FillAsync(field.CustomAmount);
+                    bCustomAmount = true;
+                }
+
+                if (field.DeliveryEmail != null)
+                {
+                    await this.giftCardsPage.GetPage().GetByRole(AriaRole.Button, new () { Name = "Email" }).ClickAsync();
+                    await this.giftCardsPage.GetPage().GetByPlaceholder("Enter an email for each recipient").FillAsync(field.DeliveryEmail);
+                }
+
+                if (field.From != null)
+                {
+                    await this.giftCardsPage.GetPage().GetByLabel("From").FillAsync(field.From);
+                }
+
+                if (field.Message != null)
+                {
+                    await this.giftCardsPage.GetPage().GetByRole(AriaRole.Textbox, new () { Name = "Message" }).FillAsync(field.Message);
+                }
+
+                if (field.Quantity != null)
+                {
+                    await this.giftCardsPage.GetPage().GetByText("Quantity").FillAsync(field.Quantity);
+                }
+
+                if (field.DeliveryDate != null)
+                {
+                    string date = string.Empty;
+                    if (field.DeliveryDate == "Today")
+                    {
+                        date = DateTime.Today.Day.ToString();
+                    }
+                    else
+                    {
+                        date = field.DeliveryDate;
+                    }
+
+                    await this.giftCardsPage.GetPage().Locator("#gc-order-form-date i").ClickAsync();
+                    await this.giftCardsPage.GetPage().GetByRole(AriaRole.Link, new () { Name = date, Exact = true }).ClickAsync();
+                }
+
+                int.TryParse(field.Quantity, out int ammountQuantity);
+
+                int ammountNumber = 0;
+                var result = bCustomAmount ? int.TryParse(field.CustomAmount, out ammountNumber) : int.TryParse(field.Amount, out ammountNumber);
+
+                var totalAmmount = ammountQuantity * ammountNumber;
+
+                await this.giftCardsPage.GetPage().Locator("#gc-buy-box-text").GetByText($"${totalAmmount}").ClickAsync();
+
+                this.scenarioContext.Set<int>(totalAmmount, HomePage.TotalAmount);
             }
         }
 
-        [Given(@"I click on the gift cards tab")]
-        public async Task OpenGiftCardsTab()
+        [Then(@"I click to button by name '([^']*)'")]
+        public async Task ClickToButtonByName(string buttonName)
         {
-            await _homePage.ClickGiftCardsTab();
+            await this.giftCardsPage.GetPage().GetByRole(AriaRole.Button, new () { Name = buttonName }).ClickAsync();
         }
 
-        [Given(@"I click on the picture eGif card")]
-        public async Task ClickEGifCard()
+        [Then(@"I validate cart total amount")]
+        public async Task ValidateCartTotalAmmount()
         {
-            await _giftCardsPage.GetPage().ClickAsync(_giftCardsPage.EGift);
-
-            //check default value
-            Assert.AreEqual(await _giftCardsPage.GetGiftGardAmount(), "$50.00");
+            await this.homePage.GetPage().GetByText($"Cart Subtotal: ${this.scenarioContext.Get<int>(HomePage.TotalAmount)}").ClickAsync();
         }
-
-        [Given(@"I choose the amount '(.*)'\$")]
-        public async Task ChooseGiftCardAmount(int giftCardAmount)
-        {
-            await _giftCardsPage.ClickToGiftCardAmount(_giftCardsPage.GetGiftGardSelectorByAmount(giftCardAmount));
-
-            _giftGardAmount = giftCardAmount;
-        }
-
-        [Given(@"Fill in To '(.*)'")]
-        public async Task FillToField(string email)
-        {
-            await _giftCardsPage.GetPage().FillAsync(_giftCardsPage.ToField, email);
-        }
-
-        [Given(@"Fill in From '(.*)'")]
-        public async Task FillFromField(string fromText)
-        {
-            await _giftCardsPage.GetPage().FillAsync(_giftCardsPage.FromField, fromText);
-        }
-
-        [Given(@"Fill in Message '(.*)'")]
-        public async Task FillMessageField(string messageText)
-        {
-            await _giftCardsPage.GetPage().FillAsync(_giftCardsPage.MessageField, messageText);
-        }
-
-        [Given(@"Fill in Quantity '(.*)'")]
-        public async Task FillQuantityField(int quantity)
-        {
-            _quantity = quantity;
-            await _giftCardsPage.GetPage().FillAsync( _giftCardsPage.Quantity, quantity.ToString());
-        }
-
-        [Then(@"I'm adding a gift card to my cart")]
-        public async Task AddGiftCardToCart()
-        {
-            string price = $"${_giftGardAmount}.00";
-
-            Assert.AreEqual(await _giftCardsPage.GetGiftGardAmount(), price);
-
-            if (_quantity > 1)
-            {
-                price = "$" + (_giftGardAmount * _quantity).ToString() + ".00";
-
-                //refresh element in DOM for get valid count
-                await _giftCardsPage.GetPage().ClickAsync(_giftCardsPage.Qty);
-            }
-            
-            Assert.AreEqual(await _giftCardsPage.GetQtyAmount(), price);
-            await _giftCardsPage.GetPage().ClickAsync(_giftCardsPage.AddToCartButton);
-
-            await _cartPage.WaitForCheckoutButton();
-            Assert.AreEqual(await _cartPage.GetCartTotalPrice(), price);
-        }
-
-        [Given(@"I choose the Animated card")]
-        public async Task ChooseAnimatedGiftCard()
-        {
-            await _giftCardsPage.GetPage().ClickAsync(_giftCardsPage.AnimatedButton);
-
-            await _giftCardsPage.WaitUntilDesignTitleTextChange();
-
-            Assert.AreEqual(await _giftCardsPage.IsAnimatedButtonSelected(), true);
-            Assert.AreEqual(await _giftCardsPage.GetDesignTitleText(), _giftCardsPage.DesignTitleAnimatedText);
-        }
-
     }
 }
