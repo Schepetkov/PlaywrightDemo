@@ -15,14 +15,4 @@
 
         // etc..
     }
-
-    public enum EGiftCardsDesignName
-    {
-        Default,
-        Animated,
-        Standard,
-        YourPhotoVideo,
-
-        // etc..
-    }
 }

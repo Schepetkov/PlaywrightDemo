@@ -9,6 +9,8 @@
         {
         }
 
+        public static string AmountGiftCardDetailsButton => "Amount";
+
         public static string EmailGiftCardDetailsButton => "Email";
 
         public static string ToEmailGiftCardDetailsField => "Enter an email for each recipient";

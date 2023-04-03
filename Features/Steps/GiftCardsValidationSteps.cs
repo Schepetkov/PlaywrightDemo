@@ -35,6 +35,7 @@
             removeLastCharFromTitleResult.ToUpper();
             string titleToValidate = removeLastCharFromTitleResult.Remove(1).ToUpper() + removeLastCharFromTitleResult.Substring(1);
 
+            // validate URL link name
             await Assertions.Expect(this.homePage.GetPage()).ToHaveTitleAsync(new Regex(titleToValidate));
         }
 
@@ -51,7 +52,7 @@
             await this.homePage.ClickToGiftCardsByType(giftCardsType);
         }
 
-        [Then(@"I wait load state '([^']*)'")]
+        [Then(@"I wait load page state '([^']*)'")]
         public async Task WaitLoadState(string stateToWaite)
         {
             Enum.TryParse(stateToWaite, out LoadState state);
@@ -77,7 +78,7 @@
                 }
                 else if (field.CustomAmount != null)
                 {
-                    await this.giftCardsPage.GetPage().GetByLabel("Amount").FillAsync(field.CustomAmount);
+                    await this.giftCardsPage.GetPage().GetByLabel(GiftCardsPage.AmountGiftCardDetailsButton).FillAsync(field.CustomAmount);
                     bCustomAmount = true;
                 }
 
@@ -135,6 +136,7 @@
                 // validate total amount before added to cart
                 await this.giftCardsPage.GetPage().Locator("#gc-buy-box-text").GetByText($"${totalAmountValue}").ClickAsync();
 
+                // save total amount value
                 this.scenarioContext.Set<int>(totalAmountValue, HomePage.TotalAmountKeyName);
             }
         }
