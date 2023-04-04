@@ -1,4 +1,5 @@
 ﻿Feature: AnimatedGiftCardsCartTotalAmountValidation
+Simple test cases for validation of total amount value
 
 Background:
 Given I navigate to 'https://www.amazon.com/'
@@ -13,7 +14,7 @@ Scenario: validate gift card total amount with custom amount
 	| Custom Amount | Delivery Email          | From    | Message    | Quantity | Delivery Date |
 	| 324           | schepetkov.dm@gmail.com | Dmitriy | Well Done! | 2        | Today         |
 	And I click to button by name 'Add to cart'
-	And I validate cart total amount
+	Then I validate cart total amount
 
 @positive
 Scenario: validate gift card total amount with fix sum via button 25$
@@ -21,7 +22,7 @@ Scenario: validate gift card total amount with fix sum via button 25$
 	| Amount | Delivery Email          | From    | Message    | Quantity | Delivery Date |
 	| 25     | schepetkov.dm@gmail.com | Dmitriy | Well Done! | 8        | Today         |
 	And I click to button by name 'Add to cart'
-	And I validate cart total amount
+	Then I validate cart total amount
 
 @positive
 Scenario: validate gift card total amount with fix sum via button 50$
@@ -29,7 +30,7 @@ Scenario: validate gift card total amount with fix sum via button 50$
 	| Amount | Delivery Email          | From    | Message    | Quantity | Delivery Date |
 	| 50     | schepetkov.dm@gmail.com | Dmitriy | Well Done! | 4        | Today         |
 	And I click to button by name 'Add to cart'
-	And I validate cart total amount
+	Then I validate cart total amount
 
 @positive
 Scenario: validate gift card total amount with fix sum via button 75$
@@ -37,7 +38,7 @@ Scenario: validate gift card total amount with fix sum via button 75$
 	| Amount | Delivery Email          | From    | Message    | Quantity | Delivery Date |
 	| 75     | schepetkov.dm@gmail.com | Dmitriy | Well Done! | 3        | Today         |
 	And I click to button by name 'Add to cart'
-	And I validate cart total amount
+	Then I validate cart total amount
 
 @positive
 Scenario: validate gift card total amount with fix sum via button 100$
@@ -45,4 +46,4 @@ Scenario: validate gift card total amount with fix sum via button 100$
 	| Amount | Delivery Email          | From    | Message    | Quantity | Delivery Date |
 	| 100    | schepetkov.dm@gmail.com | Dmitriy | Well Done! | 5        | Today         |
 	And I click to button by name 'Add to cart' 
-	And I validate cart total amount
+	Then I validate cart total amount
