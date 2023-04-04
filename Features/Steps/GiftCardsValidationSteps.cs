@@ -71,15 +71,16 @@
 
             foreach (var field in cardDetails)
             {
-                bool bCustomAmount = false;
+                int ammountNumber = 0;
                 if (field.Amount != null)
                 {
                     await this.ClickToButtonByName($"${field.Amount}");
+                    int.TryParse(field.Amount, out ammountNumber);
                 }
                 else if (field.CustomAmount != null)
                 {
                     await this.giftCardsPage.GetPage().GetByLabel(GiftCardsPage.AmountGiftCardDetailsButton).FillAsync(field.CustomAmount);
-                    bCustomAmount = true;
+                    int.TryParse(field.CustomAmount, out ammountNumber);
                 }
 
                 if (field.DeliveryEmail != null)
@@ -120,17 +121,6 @@
                 }
 
                 int.TryParse(field.Quantity, out int amountQuantity);
-
-                int ammountNumber = 0;
-                if (bCustomAmount)
-                {
-                    int.TryParse(field.CustomAmount, out ammountNumber);
-                }
-                else
-                {
-                    int.TryParse(field.Amount, out ammountNumber);
-                }
-
                 var totalAmountValue = amountQuantity * ammountNumber;
 
                 // validate total amount before added to cart

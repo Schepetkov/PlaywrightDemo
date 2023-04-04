@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\GiftCardsValidation - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\StandardGiftCardsAmountValidation - Copy.feature.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +29,19 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Features\AnimatedGiftCardsAmountValidation.feature.cs">
+      <DependentUpon>AnimatedGiftCardsAmountValidation.feature</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\AnimatedGiftCardsAmountValidation.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
   </ItemGroup>
 
 </Project>

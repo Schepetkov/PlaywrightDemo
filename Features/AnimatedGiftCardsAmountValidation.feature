@@ -1,12 +1,11 @@
-﻿Feature: StandardGiftCardsCartTotalAmountValidation
+﻿Feature: AnimatedGiftCardsCartTotalAmountValidation
 
 Background:
 Given I navigate to 'https://www.amazon.com/'
 	Then I search 'Gift Cards' 
 	And I choose the gift card by type name 'EGiftCards'
 	Then I wait load page state 'NetworkIdle'
-	And I click to button by name 'Standard'
-	And I click to button by name 'Amazon Logo'
+	And I click to button by name 'Animated'
 
 @positive
 Scenario: validate gift card total amount with custom amount
@@ -45,5 +44,5 @@ Scenario: validate gift card total amount with fix sum via button 100$
 	Then I enter gift card details
 	| Amount | Delivery Email          | From    | Message    | Quantity | Delivery Date |
 	| 100    | schepetkov.dm@gmail.com | Dmitriy | Well Done! | 5        | Today         |
-	And I click to button by name 'Add to cart'
+	And I click to button by name 'Add to cart' 
 	And I validate cart total amount
