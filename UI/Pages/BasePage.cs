@@ -19,6 +19,12 @@
             await this.GetPage().GetByRole(AriaRole.Button, new () { Name = buttonName, Exact = true }).ClickAsync();
         }
 
+        public async Task ChooseCalendarDate(string date)
+        {
+            await this.GetPage().Locator("#gc-order-form-date i").ClickAsync();
+            await this.GetPage().GetByRole(AriaRole.Link, new () { Name = date, Exact = true }).ClickAsync();
+        }
+
         public void StopTestWithReason(string reason)
         {
             var bTestFail = true;

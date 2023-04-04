@@ -71,16 +71,16 @@
 
             foreach (var field in cardDetails)
             {
-                int ammountNumber = 0;
+                int amountValue = 0;
                 if (field.Amount != null)
                 {
                     await this.ClickToButtonByName($"${field.Amount}");
-                    int.TryParse(field.Amount, out ammountNumber);
+                    int.TryParse(field.Amount, out amountValue);
                 }
                 else if (field.CustomAmount != null)
                 {
                     await this.giftCardsPage.GetPage().GetByLabel(GiftCardsPage.AmountGiftCardDetailsButton).FillAsync(field.CustomAmount);
-                    int.TryParse(field.CustomAmount, out ammountNumber);
+                    int.TryParse(field.CustomAmount, out amountValue);
                 }
 
                 if (field.DeliveryEmail != null)
@@ -116,12 +116,11 @@
                         date = field.DeliveryDate;
                     }
 
-                    await this.giftCardsPage.GetPage().Locator("#gc-order-form-date i").ClickAsync();
-                    await this.giftCardsPage.GetPage().GetByRole(AriaRole.Link, new () { Name = date, Exact = true }).ClickAsync();
+                    await this.giftCardsPage.ChooseCalendarDate(date);
                 }
 
                 int.TryParse(field.Quantity, out int amountQuantity);
-                var totalAmountValue = amountQuantity * ammountNumber;
+                var totalAmountValue = amountQuantity * amountValue;
 
                 // validate total amount before added to cart
                 await this.giftCardsPage.GetPage().Locator("#gc-buy-box-text").GetByText($"${totalAmountValue}").ClickAsync();
