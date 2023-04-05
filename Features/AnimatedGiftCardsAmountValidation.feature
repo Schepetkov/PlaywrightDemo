@@ -5,7 +5,7 @@ Background:
 Given I navigate to 'https://www.amazon.com/'
 	Then I search 'Gift Cards' 
 	And I choose the gift card by type name 'EGiftCards'
-	Then I wait load page state 'NetworkIdle'
+	Then I wait load page state 'domcontentloaded'
 	And I click to button by name 'Animated'
 
 @positive
