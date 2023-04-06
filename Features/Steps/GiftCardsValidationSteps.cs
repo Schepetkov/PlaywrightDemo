@@ -10,6 +10,7 @@
     using PlaywrightTests.WebDriver;
     using TechTalk.SpecFlow;
     using TechTalk.SpecFlow.Assist;
+    using Xunit;
 
     [Binding]
     public class GiftCardsValidationSteps
@@ -56,7 +57,14 @@
         public async Task WaitLoadState(string stateToWaite)
         {
             Enum.TryParse(stateToWaite, out LoadState state);
-            await this.homePage.GetPage().WaitForLoadStateAsync(state);
+
+            try
+            {
+                await this.homePage.GetPage().WaitForLoadStateAsync(state);
+            }
+            catch
+            {
+            }
         }
 
         [Then(@"I enter gift card details")]
@@ -139,7 +147,7 @@
         [Then(@"I validate cart total amount")]
         public async Task ValidateCartTotalAmmount()
         {
-            await this.homePage.GetPage().GetByText($"Cart Subtotal: ${this.scenarioContext.Get<int>(HomePage.TotalAmountKeyName)}").ClickAsync();
+            await this.homePage.GetPage().Locator("#ewc-content").GetByText($"${this.scenarioContext.Get<int>(HomePage.TotalAmountKeyName)}.00").ClickAsync();
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using NUnit.Framework;
-using TechTalk.SpecFlow;
+﻿using TechTalk.SpecFlow;
+using Xunit;
 
-[assembly: Parallelizable(ParallelScope.Fixtures)]
+[assembly: CollectionBehavior(MaxParallelThreads = 2)]
 
 namespace PlaywrightTests.Hooks
 {

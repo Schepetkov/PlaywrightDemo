@@ -19,10 +19,7 @@
         {
             var playwright = await Playwright.CreateAsync();
 
-            this.browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
-            {
-                Headless = false,
-            });
+            this.browser = await playwright.Chromium.LaunchAsync();
 
             return await this.browser.NewPageAsync();
         }
