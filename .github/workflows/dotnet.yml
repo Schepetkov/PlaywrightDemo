@@ -20,7 +20,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --packages .nuget --runtime win-x64 ./src/PlaywrightTests.csproj
+      run: dotnet build --no-restore
     - name: Installing Browsers and dependencies
       run: pwsh src/bin/Debug/netstandard7.0/playwright.ps1 install --with-deps
     - name: Running tests
