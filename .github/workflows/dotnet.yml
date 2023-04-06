@@ -22,8 +22,8 @@ jobs:
     - name: Build
       run: dotnet build --no-restore ./src
     - name: Installing Browsers and dependencies
-      run: pwsh src/bin/Debug/netstandard7.0/playwright.ps1 install --with-deps
+      run: pwsh src/bin/Debug/net7.0/playwright.ps1 install --with-deps
     - name: Running tests
       env:
         BROWSER: CHROMIUM
-      run: xvfb-run dotnet test ./src/PlaywrightTests.csproj -c Debug -f netcoreapp7.0 --logger:"console;verbosity=detailed" -- Playwright.Retries=1
+      run: xvfb-run dotnet test ./src/PlaywrightTests.csproj -c Debug -f net7.0 --logger:"console;verbosity=detailed" -- Playwright.Retries=1
